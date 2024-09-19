@@ -36,11 +36,17 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE.
       - uses: actions/checkout@v3
 
+      - name: Make build-image.sh executable
+        run: chmod +x ./scripts/build-image.sh
+
       #
       # Builds the Docker image.
       #
       - name: Build
         run: ./scripts/build-image.sh
+
+      - name: Make build-image.sh executable
+        run: chmod +x ./scripts/push-image.sh
 
       #
       # Publishes the Docker image to the container registry.
@@ -57,6 +63,9 @@ jobs:
         with:
           base64-kube-config: ${{ secrets.KUBE_CONFIG }}
           kubectl-version: v1.24.2
+
+      - name: Make build-image.sh executable
+        run: chmod +x ./scripts/deploy.sh
       
       #
       # Expands the configuration template and deploys the microservice.
