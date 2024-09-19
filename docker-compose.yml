@@ -1,0 +1,28 @@
+# Your Solution
+networks:
+  task92d:
+
+services:
+  book_catalog:
+    build:
+      context: .
+      dockerfile: ./book_catalog/Dockerfile
+    container_name: book_catalog
+    volumes:
+      - ./book_catalog:/book_catalog
+    ports:
+      - "8081:8081"
+    networks:
+      - task92d
+
+  inventory_management:
+    build:
+      context: .
+      dockerfile: ./inventory_management/Dockerfile
+    container_name: inventory_management
+    volumes:
+      - ./inventory_management:/inventory_management
+    ports:
+      - "8082:8082"
+    networks:
+      - task92d

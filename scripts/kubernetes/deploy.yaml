@@ -1,0 +1,42 @@
+# Write Kubernetes Deployment Script
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task92d
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task92d
+  template:
+    metadata:
+      labels:
+        app: task92d
+    spec:
+      containers:
+      - name: book-catalog
+        image: akshat19092024.azurecr.io/book_catalog:latest
+        ports:
+        - containerPort: 8081
+      - name: inventory-management
+        image: akshat19092024.azurecr.io/inventory_management:latest
+        ports:
+        - containerPort: 8082
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: task92d-service
+spec:
+  selector:
+    app: task92d
+  ports:
+    - name: book-catalog-port
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+    - name: inventory-management-port
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
+  type: LoadBalancer
