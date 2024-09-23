@@ -1,7 +1,7 @@
 # Sets global variables for this Terraform project.
 
 variable app_name {
-  default = "akshat19092024"
+  default = "akshat23092024"
 }
 
 variable group_name {
