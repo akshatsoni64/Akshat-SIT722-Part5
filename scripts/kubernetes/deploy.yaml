@@ -2,34 +2,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: task92d
+  name: task83d
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: task92d
+      app: task83d
   template:
     metadata:
       labels:
-        app: task92d
+        app: task83d
     spec:
       containers:
       - name: book-catalog
-        image: akshat19092024.azurecr.io/book_catalog:${VERSION}
+        image: akshat23092024.azurecr.io/book_catalog:${VERSION}
         ports:
         - containerPort: 8081
       - name: inventory-management
-        image: akshat19092024.azurecr.io/inventory_management:${VERSION}
+        image: akshat23092024.azurecr.io/inventory_management:${VERSION}
         ports:
         - containerPort: 8082
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: task92d-service
+  name: task83d-service
 spec:
   selector:
-    app: task92d
+    app: task83d
   ports:
     - name: book-catalog-port
       protocol: TCP
