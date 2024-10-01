@@ -15,11 +15,11 @@ spec:
     spec:
       containers:
       - name: book-catalog
-        image: akshat23092024.azurecr.io/book_catalog:${VERSION}
+        image: ${CONTAINER_REGISTRY}/book_catalog:${VERSION}
         ports:
         - containerPort: 8081
       - name: inventory-management
-        image: akshat23092024.azurecr.io/inventory_management:${VERSION}
+        image: ${CONTAINER_REGISTRY}/inventory_management:${VERSION}
         ports:
         - containerPort: 8082
 ---

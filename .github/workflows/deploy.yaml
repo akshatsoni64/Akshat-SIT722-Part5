@@ -22,14 +22,52 @@ on:
 
 jobs:
 
-  deploy:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.0
+
+      - name: Terraform Init
+        run: |
+          cd ./scripts/terraform
+          terraform init
+      
+      - name: Terraform Apply
+        id: apply
+        run: |
+          cd ./scripts/terraform
+          terraform apply -auto-approve
+
+      - name: Get Outputs
+        id: get_outputs
+        run: |
+          echo "CONTAINER_REGISTRY=$(terraform output -raw container_registry_url)" >> $GITHUB_ENV
+          echo "REGISTRY_UN=$(terraform output -raw registry_username)" >> $GITHUB_ENV
+          echo "REGISTRY_PW=$(terraform output -raw registry_password)" >> $GITHUB_ENV
+          echo "KUBE_CONFIG=$(cat ~/.kube/config | base64)" >> $GITHUB_ENV  # Set KUBE_CONFIG
+          echo "RESOURCE_GROUP=$(terraform output -raw resource_group_name)" >> $GITHUB_ENV
+          echo "AKS_CLUSTER_NAME=$(terraform output -raw aks_cluster_name)" >> $GITHUB_ENV
+
+      - name: Set Kubeconfig
+        run: |
+          az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }} --admin
+
+deploy:
     runs-on: ubuntu-latest
     
     env:
       VERSION: ${{ github.sha }}
-      CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
-      REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
-      REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+      CONTAINER_REGISTRY: ${{ env.CONTAINER_REGISTRY }}  # Use the output from Terraform
+      REGISTRY_UN: ${{ env.REGISTRY_UN }}  # Use the output from Terraform
+      REGISTRY_PW: ${{ env.REGISTRY_PW }}  # Use the output from Terraform
+      KUBE_CONFIG: ${{ env.KUBE_CONFIG }}  # Use the kubeconfig generated
 
     steps:
       
@@ -45,7 +83,7 @@ jobs:
       - name: Build
         run: ./scripts/build-image.sh
 
-      - name: Make build-image.sh executable
+      - name: Make push-image.sh executable
         run: chmod +x ./scripts/push-image.sh
 
       #
@@ -54,17 +92,12 @@ jobs:
       - name: Publish
         run: ./scripts/push-image.sh
 
-      #
-      # Installs Kubectl and connects it to the cluster.
-      #
-      # https://github.com/marketplace/actions/kubernetes-cli-kubectl
-      #
-      - uses: tale/kubectl-action@v1
-        with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-          kubectl-version: v1.24.2
+      - name: Set up Kubectl
+        run: |
+          echo $KUBE_CONFIG | base64 --decode > ~/.kube/config  # Decode the kubeconfig
 
-      - name: Make build-image.sh executable
+
+      - name: Make deploy.sh executable
         run: chmod +x ./scripts/deploy.sh
       
       #
