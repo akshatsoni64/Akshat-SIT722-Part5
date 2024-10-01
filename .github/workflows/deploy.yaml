@@ -24,7 +24,13 @@ jobs:
 
   terraform:
     runs-on: ubuntu-latest
-
+    outputs:
+      CONTAINER_REGISTRY: steps.get_outputs.env.CONTAINER_REGISTRY
+      REGISTRY_UN: steps.get_outputs.env.REGISTRY_UN
+      REGISTRY_PW: steps.get_outputs.env.REGISTRY_PW
+      KUBE_CONFIG: steps.get_outputs.env.KUBE_CONFIG
+      RESOURCE_GROUP: steps.get_outputs.env.RESOURCE_GROUP
+      AKS_CLUSTER_NAME: steps.get_outputs.env.AKS_CLUSTER_NAME
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -48,26 +54,27 @@ jobs:
       - name: Get Outputs
         id: get_outputs
         run: |
-          echo "CONTAINER_REGISTRY=$(terraform output -raw container_registry_url)" >> $GITHUB_ENV
-          echo "REGISTRY_UN=$(terraform output -raw registry_username)" >> $GITHUB_ENV
-          echo "REGISTRY_PW=$(terraform output -raw registry_password)" >> $GITHUB_ENV
-          echo "KUBE_CONFIG=$(cat ~/.kube/config | base64)" >> $GITHUB_ENV  # Set KUBE_CONFIG
-          echo "RESOURCE_GROUP=$(terraform output -raw resource_group_name)" >> $GITHUB_ENV
-          echo "AKS_CLUSTER_NAME=$(terraform output -raw aks_cluster_name)" >> $GITHUB_ENV
+          echo "CONTAINER_REGISTRY=$(terraform output -raw container_registry_url)" >> $GITHUB_OUTPUT
+          echo "REGISTRY_UN=$(terraform output -raw registry_username)" >> $GITHUB_OUTPUT
+          echo "REGISTRY_PW=$(terraform output -raw registry_password)" >> $GITHUB_OUTPUT
+          echo "KUBE_CONFIG=$(cat ~/.kube/config | base64)" >> $GITHUB_OUTPUT  # Set KUBE_CONFIG
+          echo "RESOURCE_GROUP=$(terraform output -raw resource_group_name)" >> $GITHUB_OUTPUT
+          echo "AKS_CLUSTER_NAME=$(terraform output -raw aks_cluster_name)" >> $GITHUB_OUTPUT
 
       - name: Set Kubeconfig
         run: |
           az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }} --admin
 
   deploy:
+    needs: [terraform]
     runs-on: ubuntu-latest
     
     env:
       VERSION: ${{ github.sha }}
-      CONTAINER_REGISTRY: ${{ env.CONTAINER_REGISTRY }}  # Use the output from Terraform
-      REGISTRY_UN: ${{ env.REGISTRY_UN }}  # Use the output from Terraform
-      REGISTRY_PW: ${{ env.REGISTRY_PW }}  # Use the output from Terraform
-      KUBE_CONFIG: ${{ env.KUBE_CONFIG }}  # Use the kubeconfig generated
+      CONTAINER_REGISTRY: ${{ needs.terraform.outputs.CONTAINER_REGISTRY }}  # Use the output from Terraform
+      REGISTRY_UN: ${{ needs.terraform.outputs.REGISTRY_UN }}  # Use the output from Terraform
+      REGISTRY_PW: ${{ needs.terraform.outputs.REGISTRY_PW }}  # Use the output from Terraform
+      KUBE_CONFIG: ${{ needs.terraform.outputs.KUBE_CONFIG }}  # Use the kubeconfig generated
 
     steps:
       
