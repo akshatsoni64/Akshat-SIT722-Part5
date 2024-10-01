@@ -19,15 +19,15 @@ on:
   # Allows deployment to be invoked manually through the GitHub Actions user interface.
   #
   workflow_dispatch: 
-env:
-  ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
-  ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-  ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
 
 jobs:
 
   terraform:
     runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
+      ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+      ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
     outputs:
       CONTAINER_REGISTRY: steps.get_outputs.env.CONTAINER_REGISTRY
       REGISTRY_UN: steps.get_outputs.env.REGISTRY_UN
