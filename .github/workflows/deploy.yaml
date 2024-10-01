@@ -63,13 +63,13 @@ jobs:
           echo "CONTAINER_REGISTRY=$(terraform output -raw container_registry_url)" >> $GITHUB_OUTPUT
           echo "REGISTRY_UN=$(terraform output -raw registry_username)" >> $GITHUB_OUTPUT
           echo "REGISTRY_PW=$(terraform output -raw registry_password)" >> $GITHUB_OUTPUT
-          echo "KUBE_CONFIG=$(cat ~/.kube/config | base64)" >> $GITHUB_OUTPUT  # Set KUBE_CONFIG
           echo "RESOURCE_GROUP=$(terraform output -raw resource_group_name)" >> $GITHUB_OUTPUT
           echo "AKS_CLUSTER_NAME=$(terraform output -raw aks_cluster_name)" >> $GITHUB_OUTPUT
 
       - name: Set Kubeconfig
         run: |
           az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }} --admin
+          echo "KUBE_CONFIG=$(cat ~/.kube/config | base64)" >> $GITHUB_OUTPUT  # Set KUBE_CONFIG
 
   deploy:
     needs: [terraform]
