@@ -71,7 +71,7 @@ jobs:
           echo "KUBE_CONFIG=$(cat ~/.kube/config | base64)" >> $GITHUB_ENV  # Set KUBE_CONFIG
 
   deploy:
-    needs: [terraform]
+    needs: terraform
     runs-on: ubuntu-latest
     
     env:
