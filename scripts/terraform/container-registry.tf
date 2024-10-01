@@ -22,5 +22,5 @@ output "container_registry_url" {
 }
 
 output "resource_group_name" {
-  value = azurerm_resource_group.container_registry.resource_group_name
+  value = var.group_name
 }
