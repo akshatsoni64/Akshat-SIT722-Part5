@@ -15,6 +15,7 @@ output "registry_username" {
 
 output "registry_password" {
   value = azurerm_container_registry.container_registry.admin_password
+  sensitive = true
 }
 
 output "container_registry_url" {
