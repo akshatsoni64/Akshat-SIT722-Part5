@@ -76,10 +76,10 @@ jobs:
     
     env:
       VERSION: ${{ github.sha }}
-      CONTAINER_REGISTRY: ${{ needs.terraform.env.CONTAINER_REGISTRY }}  # Use the output from Terraform
-      REGISTRY_UN: ${{ needs.terraform.env.REGISTRY_UN }}  # Use the output from Terraform
-      REGISTRY_PW: ${{ needs.terraform.env.REGISTRY_PW }}  # Use the output from Terraform
-      KUBE_CONFIG: ${{ needs.terraform.env.KUBE_CONFIG }}  # Use the kubeconfig generated
+      CONTAINER_REGISTRY: ${{ env.CONTAINER_REGISTRY }}  # Use the output from Terraform
+      REGISTRY_UN: ${{ env.REGISTRY_UN }}  # Use the output from Terraform
+      REGISTRY_PW: ${{ env.REGISTRY_PW }}  # Use the output from Terraform
+      KUBE_CONFIG: ${{ env.KUBE_CONFIG }}  # Use the kubeconfig generated
 
     steps:
       
