@@ -59,7 +59,7 @@ jobs:
         run: |
           az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }} --admin
 
-deploy:
+  deploy:
     runs-on: ubuntu-latest
     
     env:
